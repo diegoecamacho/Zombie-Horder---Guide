@@ -65,6 +65,14 @@ public class @GameInputActions : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""be01304e-d07f-430f-8269-7d76861a1f50"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -177,6 +185,17 @@ public class @GameInputActions : IInputActionCollection, IDisposable
                     ""action"": ""Reloading"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4df0721a-e725-4457-a79e-4141a787ef98"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": ""Press(behavior=2)"",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -208,6 +227,7 @@ public class @GameInputActions : IInputActionCollection, IDisposable
         m_CharacterControls_Fire = m_CharacterControls.FindAction("Fire", throwIfNotFound: true);
         m_CharacterControls_Look = m_CharacterControls.FindAction("Look", throwIfNotFound: true);
         m_CharacterControls_Reloading = m_CharacterControls.FindAction("Reloading", throwIfNotFound: true);
+        m_CharacterControls_Jump = m_CharacterControls.FindAction("Jump", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -263,6 +283,7 @@ public class @GameInputActions : IInputActionCollection, IDisposable
     private readonly InputAction m_CharacterControls_Fire;
     private readonly InputAction m_CharacterControls_Look;
     private readonly InputAction m_CharacterControls_Reloading;
+    private readonly InputAction m_CharacterControls_Jump;
     public struct CharacterControlsActions
     {
         private @GameInputActions m_Wrapper;
@@ -273,6 +294,7 @@ public class @GameInputActions : IInputActionCollection, IDisposable
         public InputAction @Fire => m_Wrapper.m_CharacterControls_Fire;
         public InputAction @Look => m_Wrapper.m_CharacterControls_Look;
         public InputAction @Reloading => m_Wrapper.m_CharacterControls_Reloading;
+        public InputAction @Jump => m_Wrapper.m_CharacterControls_Jump;
         public InputActionMap Get() { return m_Wrapper.m_CharacterControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -300,6 +322,9 @@ public class @GameInputActions : IInputActionCollection, IDisposable
                 @Reloading.started -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnReloading;
                 @Reloading.performed -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnReloading;
                 @Reloading.canceled -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnReloading;
+                @Jump.started -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_CharacterControlsActionsCallbackInterface.OnJump;
             }
             m_Wrapper.m_CharacterControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -322,6 +347,9 @@ public class @GameInputActions : IInputActionCollection, IDisposable
                 @Reloading.started += instance.OnReloading;
                 @Reloading.performed += instance.OnReloading;
                 @Reloading.canceled += instance.OnReloading;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
         }
     }
@@ -343,5 +371,6 @@ public class @GameInputActions : IInputActionCollection, IDisposable
         void OnFire(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
         void OnReloading(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

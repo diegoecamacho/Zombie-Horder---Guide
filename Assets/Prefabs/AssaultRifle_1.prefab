@@ -109,6 +109,7 @@ MonoBehaviour:
   FiringAnimation: {fileID: 1320275964731592, guid: 0624c6f5a57851d48ba74b4f86ec13d7, type: 3}
   WeaponInformation:
     Name: AK-47
+    Damage: 20
     BulletsInClip: 20
     ClipSize: 20
     TotalBulletsAvailable: 100
@@ -117,7 +118,7 @@ MonoBehaviour:
     FireDistance: 100
     WeaponHitLayers:
       serializedVersion: 2
-      m_Bits: 4294967295
+      m_Bits: 127
     Repeating: 1
 --- !u!1001 &8463592139716934289
 PrefabInstance:

@@ -1,4 +1,5 @@
 using Events;
+using Interfaces;
 using Parents;
 using UI;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Weapons
         public Transform GripHandPlacementLocation => GripLocation;
         public Transform BarrelLocation => BarrelLocationPoint;
         public bool WeaponFiring { get; private set; } = false;
+        public bool Reloading { get; private set; }
 
         public WeaponEvents.WeaponStats WeaponInfo => WeaponInformation;
 
@@ -37,7 +39,6 @@ namespace Weapons
 
         private ParticleSystem FiringEffect;
 
-        private bool Reloading = false;
 
         //Debug
         private RaycastHit HitLocation;
@@ -77,7 +78,7 @@ namespace Weapons
         {
             if (WeaponInformation.BulletsInClip > 0 && !Reloading)
             {
-                Debug.Log("Fire Weapon");
+                //Debug.Log("Fire Weapon");
                 if (!FiringEffect)
                 {
                     FiringEffect = Instantiate(FiringAnimation, BarrelLocation).GetComponent<ParticleSystem>();
@@ -97,11 +98,19 @@ namespace Weapons
                     WeaponInformation.FireDistance, WeaponInformation.WeaponHitLayers)) return;
 
                 HitLocation = hit;
+                
+                DamageTarget(hit);
             }
             else if (WeaponInformation.BulletsInClip == 0)
             {
                 WeaponHolder.StartReloading();
             }
+        }
+
+        private void DamageTarget(RaycastHit hit)
+        {
+            IDamageable damageable = hit.collider.GetComponent<IDamageable>();
+            damageable?.TakeDamage(WeaponInformation.Damage);
         }
 
         public void StartReloading()

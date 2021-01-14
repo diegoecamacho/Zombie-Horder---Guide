@@ -40,14 +40,10 @@ namespace Weapons
             WeaponFiringHash = Animator.StringToHash("firing");
             WeaponReloadingHash = Animator.StringToHash("reloading");
         }
-
-       
-
+        
         // Start is called before the first frame update
         private void Start()
         {
-            WeaponEvents.OnWeaponReloaded += StopReloading;
-            
             GameObject spawnedWeapon =
                 Instantiate(WeaponToSpawn, WeaponSpawnLocation.position, WeaponSpawnLocation.rotation);
             spawnedWeapon.transform.parent = WeaponSpawnLocation;
@@ -85,19 +81,26 @@ namespace Weapons
         
         public void OnReloading(InputValue value)
         {
-           StartReloading();
+            if (!WeaponComponent.Reloading)
+            {
+                StartReloading();
+            }
         }
 
         public void StartReloading()
         {
             PlayerAnimator.SetBool(WeaponReloadingHash, true);
            WeaponComponent.StartReloading();
+           
+           InvokeRepeating(nameof(StopReloading), 0, 0.1f);
         }
 
         public void StopReloading()
         {
-            PlayerAnimator.SetBool(WeaponReloadingHash, false);
+            if (PlayerAnimator.GetBool(WeaponReloadingHash)) return;
+            
             WeaponComponent.StopReloading();
+            CancelInvoke(nameof(StopReloading));
         }
     }
 }

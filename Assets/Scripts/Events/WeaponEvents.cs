@@ -10,6 +10,7 @@ namespace Events
         public struct WeaponStats
         {
             public string Name;
+            public float Damage;
             public int BulletsInClip;
             public int ClipSize;
             public int TotalBulletsAvailable;
@@ -20,6 +21,7 @@ namespace Events
             public bool Repeating;
 
             public WeaponStats(string name,
+                float damage,
                 int bulletsInClip,
                 int clipSize,
                 int totalBulletsAvailable,
@@ -30,6 +32,7 @@ namespace Events
             )
             {
                 Name = name;
+                Damage = damage;
                 BulletsInClip = bulletsInClip;
                 ClipSize = clipSize;
                 FireRate = fireRate;
