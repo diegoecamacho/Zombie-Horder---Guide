@@ -10,13 +10,11 @@ namespace Enemies.Spawners
         private void Awake()
         {
             Collider = GetComponentInChildren<BoxCollider>();
-            
-            Debug.Log(GetPositionInBounds());
         }
 
         public Vector3 GetPositionInBounds()
         {
-            Bounds bounds = Collider.bounds;
+            var bounds = Collider.bounds;
             return new Vector3(
                 Random.Range(bounds.min.x, bounds.max.x),
                 transform.position.y,

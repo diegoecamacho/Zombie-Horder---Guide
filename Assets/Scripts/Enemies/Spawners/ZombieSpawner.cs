@@ -30,7 +30,7 @@ namespace Enemies.Spawners
             SpawnerTrigger trigger = TriggerZones[Random.Range(0, TriggerZones.Length)];
             GameObject zombie = Instantiate(spawnedZombie, trigger.GetPositionInBounds(), trigger.transform.rotation);
             
-            zombie.GetComponent<EnemyComponent>().Initialize(PlayerGameObject.gameObject);
+            zombie.GetComponent<ZombieComponent>().Initialize(PlayerGameObject.gameObject);
         }
         
     }

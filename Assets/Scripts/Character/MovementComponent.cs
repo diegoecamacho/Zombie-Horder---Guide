@@ -37,7 +37,7 @@ namespace Character
         private int IsRunningHash;
 
 
-        private new void Awake()
+        private void Awake()
         {
             PlayerAnimator = GetComponent<Animator>();
             NavAgent = GetComponent<NavMeshAgent>();

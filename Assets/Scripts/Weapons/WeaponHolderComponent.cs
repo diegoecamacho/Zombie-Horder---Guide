@@ -30,11 +30,10 @@ namespace Weapons
         private int WeaponFiringHash;
         private int WeaponReloadingHash;
 
-        private new void Awake()
+        private void Awake()
         {
             PlayerAnimator = GetComponent<Animator>();
             CrossHairFollow = GetComponent<PlayerController>().CrossHairComponent;
-            
             
             //Animation Hash
             WeaponFiringHash = Animator.StringToHash("firing");
@@ -44,7 +43,7 @@ namespace Weapons
         // Start is called before the first frame update
         private void Start()
         {
-            GameObject spawnedWeapon =
+            var spawnedWeapon =
                 Instantiate(WeaponToSpawn, WeaponSpawnLocation.position, WeaponSpawnLocation.rotation);
             spawnedWeapon.transform.parent = WeaponSpawnLocation;
 

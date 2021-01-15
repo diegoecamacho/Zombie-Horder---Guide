@@ -3,31 +3,23 @@ using UnityEngine;
 
 namespace Character
 {
-    public class HealthComponent : MonoBehaviour , IDamageable, IKillable
+    public class HealthComponent : MonoBehaviour , IDamageable
     {
 
         public float Health => CurrentHealth;
+        public float MaxHealth => TotalHealth;
     
         [SerializeField] private float CurrentHealth;
         [SerializeField] private float TotalHealth;
         
-        private void Start()
+        protected virtual void Start()
         {
             CurrentHealth = TotalHealth;
         }
 
-        public void TakeDamage(float damage)
+        public virtual void TakeDamage(float damage)
         {
             CurrentHealth -= damage;
-            if (CurrentHealth <= 0)
-            {
-                KillTarget();
-            }
-        }
-        
-        public void KillTarget()
-        {
-            Destroy(gameObject);
         }
     }
 }
