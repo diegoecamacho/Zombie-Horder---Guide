@@ -54,53 +54,29 @@ namespace Weapons
             CrossHairFollow = crossHairFollowMouse;
         }
 
-        public void BeginFiringWeapon()
-        {
-            WeaponFiring = true;
-            if (WeaponInformation.Repeating)
-            {
-                InvokeRepeating(nameof(FireWeapon), WeaponInformation.FireStartDelay, WeaponInformation.FireRate);
-            }
-            else
-            {
-                FireWeapon();
-            }
-        }
-
-        public void EndFiringWeapon()
-        {
-            WeaponFiring = false;
-            if (FiringEffect) Destroy(FiringEffect.gameObject);
-            CancelInvoke(nameof(FireWeapon));
-        }
-
         private void FireWeapon()
         {
             if (WeaponInformation.BulletsInClip > 0 && !Reloading)
             {
-                //Debug.Log("Fire Weapon");
                 if (!FiringEffect)
                 {
                     FiringEffect = Instantiate(FiringAnimation, BarrelLocation).GetComponent<ParticleSystem>();
                 }
+                
+                //Shoot Ray at Crosshair position
+                Ray screenRay = ViewCamera.ScreenPointToRay(new Vector3(CrossHairFollow.CurrentAimPosition.x,
+                    CrossHairFollow.CurrentAimPosition.y, 0));
 
-                Vector3 worldPoint = ViewCamera.ScreenToWorldPoint(new Vector3(CrossHairFollow.CurrentLookPosition.x,
-                    CrossHairFollow.CurrentLookPosition.y, transform.position.z));
-
-                AimWorldDirection = worldPoint - BarrelLocationPoint.position;
-                AimWorldDirection.Normalize();
-
-                Debug.DrawRay(BarrelLocationPoint.position, AimWorldDirection * WeaponInformation.FireDistance,
-                    Color.red);
+                if (!Physics.Raycast(screenRay, out RaycastHit hit, WeaponInfo.FireDistance,
+                    WeaponInfo.WeaponHitLayers)) return;
+                
                 WeaponInformation.BulletsInClip--;
 
-                if (!Physics.Raycast(BarrelLocationPoint.position, AimWorldDirection, out RaycastHit hit,
-                    WeaponInformation.FireDistance, WeaponInformation.WeaponHitLayers)) return;
-
+                //Debug Hit Location
                 HitLocation = hit;
-                
                 DamageTarget(hit);
             }
+            //Reload weapon when out of bullets.
             else if (WeaponInformation.BulletsInClip == 0)
             {
                 WeaponHolder.StartReloading();
@@ -142,6 +118,26 @@ namespace Weapons
                 WeaponInformation.BulletsInClip = WeaponInformation.ClipSize;
                 WeaponInformation.TotalBulletsAvailable -= WeaponInformation.ClipSize;
             }
+        }
+        
+        public void BeginFiringWeapon()
+        {
+            WeaponFiring = true;
+            if (WeaponInformation.Repeating)
+            {
+                InvokeRepeating(nameof(FireWeapon), WeaponInformation.FireStartDelay, WeaponInformation.FireRate);
+            }
+            else
+            {
+                FireWeapon();
+            }
+        }
+
+        public void EndFiringWeapon()
+        {
+            WeaponFiring = false;
+            if (FiringEffect) Destroy(FiringEffect.gameObject);
+            CancelInvoke(nameof(FireWeapon));
         }
 
         private void OnDrawGizmos()

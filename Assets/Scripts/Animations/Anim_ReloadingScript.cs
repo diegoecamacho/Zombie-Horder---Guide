@@ -5,7 +5,7 @@ namespace Animations
 {
     public class Anim_ReloadingScript : StateMachineBehaviour
     {
-        private static readonly int Reloading = Animator.StringToHash("reloading");
+        private static readonly int Reloading = Animator.StringToHash("isReloading");
 
         // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
         public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

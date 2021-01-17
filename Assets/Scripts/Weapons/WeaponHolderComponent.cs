@@ -17,42 +17,46 @@ namespace Weapons
 
         [Header("Bone Positions")] [SerializeField]
         private Transform WeaponSpawnLocation;
-
-        private Animator PlayerAnimator;
-
+        
         private Transform GripIKLocation;
 
+        //Components
+        private PlayerController PlayerController;
+        private Animator PlayerAnimator;
         private WeaponComponent WeaponComponent;
-        
         private CrossHairFollowMouse CrossHairFollow;
 
         //Animator Hashcode
-        private int WeaponFiringHash;
-        private int WeaponReloadingHash;
+        private readonly int WeaponFiringHash =  Animator.StringToHash("isFiring");
+        private readonly int WeaponReloadingHash =  Animator.StringToHash("isReloading");
 
         private void Awake()
         {
             PlayerAnimator = GetComponent<Animator>();
-            CrossHairFollow = GetComponent<PlayerController>().CrossHairComponent;
+            PlayerController = GetComponent<PlayerController>();
             
-            //Animation Hash
-            WeaponFiringHash = Animator.StringToHash("firing");
-            WeaponReloadingHash = Animator.StringToHash("reloading");
+            if (PlayerController) CrossHairFollow = PlayerController.CrossHairComponent;
         }
         
         // Start is called before the first frame update
         private void Start()
         {
-            var spawnedWeapon =
+            GameObject spawnedWeapon =
                 Instantiate(WeaponToSpawn, WeaponSpawnLocation.position, WeaponSpawnLocation.rotation);
+
+            if (!spawnedWeapon) return;
+   
+            //Set Weapon in Weapon Socket
             spawnedWeapon.transform.parent = WeaponSpawnLocation;
 
+            //Get Weapon Component
             WeaponComponent = spawnedWeapon.GetComponent<WeaponComponent>();
             
-            GripIKLocation = WeaponComponent.GripHandPlacementLocation;
-
             if (!WeaponComponent) return;
-
+            //Set IK Location for weapon holding.
+            GripIKLocation = WeaponComponent.GripHandPlacementLocation;
+            
+            //Initialize Weapon
             WeaponComponent.Initialize(this, CrossHairFollow);
             WeaponEvents.Invoke_OnWeaponEquipped(WeaponComponent);
         }
@@ -66,39 +70,45 @@ namespace Weapons
         //Input Actions
         public void OnFire(InputValue value)
         {
+            if (PlayerController.IsReloading) return;
+            
             if (value.isPressed)
             {
-                PlayerAnimator.SetBool(WeaponFiringHash, true);
+                PlayerController.IsFiring = true;
+                PlayerAnimator.SetBool(WeaponFiringHash, PlayerController.IsFiring);
                 WeaponComponent.BeginFiringWeapon();
             }
             else
             {
-                PlayerAnimator.SetBool(WeaponFiringHash, false);
+                PlayerController.IsFiring = false;
+                PlayerAnimator.SetBool(WeaponFiringHash, PlayerController.IsFiring);
                 WeaponComponent.EndFiringWeapon();
             }
         }
         
         public void OnReloading(InputValue value)
         {
-            if (!WeaponComponent.Reloading)
-            {
-                StartReloading();
-            }
+            if (WeaponComponent.Reloading) return;
+            StartReloading();
         }
 
         public void StartReloading()
         {
-            PlayerAnimator.SetBool(WeaponReloadingHash, true);
-           WeaponComponent.StartReloading();
+            PlayerController.IsReloading = true;
+            PlayerAnimator.SetBool(WeaponReloadingHash, PlayerController.IsReloading);
+            WeaponComponent.StartReloading();
            
-           InvokeRepeating(nameof(StopReloading), 0, 0.1f);
+            InvokeRepeating(nameof(StopReloading), 0, 0.1f);
         }
 
         public void StopReloading()
         {
             if (PlayerAnimator.GetBool(WeaponReloadingHash)) return;
             
+            PlayerController.IsReloading = false;
+            
             WeaponComponent.StopReloading();
+            
             CancelInvoke(nameof(StopReloading));
         }
     }

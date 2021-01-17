@@ -1,6 +1,3 @@
-using Cinemachine;
-using Helpers;
-using Parents;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,27 +6,25 @@ namespace Character
 {
     public class CameraControls : MonoBehaviour
     {
-        [Header("Settings")] [SerializeField] private float RotationPower = 10;
-
+        [Header("Settings")]
+        [SerializeField] private float RotationPower = 10;
         [SerializeField] private float HorizontalDamping = 1;
-
-        [SerializeField] private Transform FollowTarget;
-
-        private Animator PlayerAnimator;
+        [SerializeField] private GameObject FollowTarget;
 
         private Vector2 PreviousFrameMouseInput;
-
-        [Header("Components")]
+       
+        //Transform References
+        private Transform FollowTargetTransform;
+        
         //Components
         private Camera ViewCamera;
-
+        private Animator PlayerAnimator;
         private CrossHairFollowMouse CrossHairFollow;
-
-
+        
         //Animation Hashes
-        private int VerticalAim;
-        private int HorizontalAim;
-
+        private readonly int VerticalAim =  Animator.StringToHash("aimVertical");
+        private readonly int HorizontalAim = Animator.StringToHash("aimHorizontal");
+        
         // Start is called before the first frame update
         private void Awake()
         {
@@ -37,49 +32,30 @@ namespace Character
             PlayerAnimator = GetComponent<Animator>();
             CrossHairFollow = GetComponent<PlayerController>().CrossHairComponent;
 
-            //Animation Hashes Initialization
-            VerticalAim = Animator.StringToHash("aimVertical");
-            HorizontalAim = Animator.StringToHash("aimHorizontal");
+            //Cached Values
+            FollowTargetTransform = FollowTarget.transform;
         }
 
         private void OnLook(InputValue value)
         {
             Vector2 aimValue = value.Get<Vector2>();
 
-            Transform followTransform = FollowTarget.transform;
-
-            followTransform.rotation *=
+            //Rotate Around a certain on Aim Value
+            FollowTargetTransform.rotation *=
                 Quaternion.AngleAxis(
                     Mathf.Lerp(PreviousFrameMouseInput.x, aimValue.x, 1f / HorizontalDamping) * RotationPower,
                     Vector3.up);
 
-            Vector3 angles = followTransform.localEulerAngles;
-            angles.z = 0;
-
-            float angle = followTransform.localEulerAngles.x;
-
-            //Clamp the Up/Down rotation
-            if (angle > 180 && angle < 340)
-            {
-                angles.x = 340;
-            }
-            else if (angle < 180 && angle > 40)
-            {
-                angles.x = 40;
-            }
-
-            FollowTarget.transform.localEulerAngles = angles;
-
             //Set the player rotation based on the look transform
-            transform.rotation = Quaternion.Euler(0, followTransform.transform.rotation.eulerAngles.y, 0);
+            transform.rotation = Quaternion.Euler(0, FollowTargetTransform.transform.rotation.eulerAngles.y, 0);
 
-            //reset the y rotation of the look transform
-            followTransform.transform.localEulerAngles = new Vector3(angles.x, 0, 0);
+            //reset the follow rotation to center the camera
+            FollowTargetTransform.localEulerAngles = Vector3.zero;
 
             PreviousFrameMouseInput = aimValue;
 
             //Animation Setup
-            Vector3 independentMousePosition = ViewCamera.ScreenToViewportPoint(CrossHairFollow.CurrentLookPosition);
+            Vector3 independentMousePosition = ViewCamera.ScreenToViewportPoint(CrossHairFollow.CurrentAimPosition);
 
             PlayerAnimator.SetFloat(VerticalAim,
                 CrossHairFollow.Inverted ? independentMousePosition.y : 1f - independentMousePosition.y);

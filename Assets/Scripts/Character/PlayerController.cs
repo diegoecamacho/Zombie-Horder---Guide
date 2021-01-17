@@ -8,6 +8,13 @@ namespace Character
     {
         public CrossHairFollowMouse CrossHairComponent => CrossHairFollowMouse;
         [SerializeField] private CrossHairFollowMouse CrossHairFollowMouse;
-        // Start is called before the first frame update
+        
+        public bool IsFiring = false;
+        
+        public bool IsReloading = false;
+        
+        public bool IsJumping = false;
+        
+        public bool IsRunning = false;
     }
 }

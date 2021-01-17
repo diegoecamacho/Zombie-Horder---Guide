@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4387624373159625755}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.458, y: 1.584, z: -0.015}
+  m_LocalPosition: {x: 0.69, y: 1.584, z: 0.14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7892945671152309557}
@@ -958,6 +958,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CrossHairFollowMouse: {fileID: 0}
+  IsFiring: 0
+  IsReloading: 0
+  IsJumping: 0
+  IsRunning: 0
 --- !u!114 &2230581734849853402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,6 +989,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementSpeed: 3
+  RunSpeed: 6
   JumpForce: 4
 --- !u!114 &570312799
 MonoBehaviour:
@@ -1012,9 +1017,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2f731ff44c27e479e879d8afa34bb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RotationPower: 0.2
+  RotationPower: 0.12
   HorizontalDamping: 20
-  FollowTarget: {fileID: 4387624373159625752}
+  FollowTarget: {fileID: 4387624373159625755}
 --- !u!195 &5864081381676499546
 NavMeshAgent:
   m_ObjectHideFlags: 0

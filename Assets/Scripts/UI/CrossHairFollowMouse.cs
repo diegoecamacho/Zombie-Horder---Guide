@@ -8,75 +8,82 @@ namespace UI
 {
     public class CrossHairFollowMouse : InputMonoBehaviour
     {
-        public Vector2 CurrentLookPosition { get; private set; }
+        public Vector2 CurrentAimPosition { get; private set; }
 
         [Header("Settings")] public Vector2 MouseSensitivity;
         public bool Inverted;
         public bool DisableCursor;
-
-
-        [Header("Angles")] [SerializeField] private float MaxAngleVertical;
-        [SerializeField] private float MinAngleVertical;
-
-        [SerializeField] private float MaxAngleHorizontal;
-        [SerializeField] private float MinAngleHorizontal;
+        
+        [SerializeField, Range(0f , 0.5f)] private float CrosshairHorizontalPercentage = 0.25f;
+        private float HorizontalOffset = 0f;
+        private float MaxHorizontalAngle = 0f;
+        private float MinHorizontalAngle = 0f;
+         
+        [SerializeField, Range(0f , 0.5f)] private float CrosshairVerticalPercentage = 0.25f;
+        private float VerticalOffset = 0f;
+        private float MaxVerticalAngle = 0f;
+        private float MinVerticalAngle = 0f;
 
         private Vector2 CrossHairStartingPosition;
-
         private Vector2 CurrentLookDeltas;
-
-        private Vector2 MouseDelta;
-
-        private Camera Camera;
-
 
         private new void Awake()
         {
             base.Awake();
 
-            Camera = Camera.main;
-
             if (!DisableCursor) return;
-
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Start()
         {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-
             CrossHairStartingPosition = new Vector2(Screen.width / 2f, Screen.height / 2f);
+
+            //Crosshair Constrains Setup
+            HorizontalOffset = Screen.width * CrosshairHorizontalPercentage;
+            MinHorizontalAngle = -(Screen.width / 2f) + HorizontalOffset;
+            MaxHorizontalAngle = (Screen.width / 2f) - HorizontalOffset;
+
+            Debug.Log($"{MinHorizontalAngle} :: {MaxHorizontalAngle}");
+            
+            VerticalOffset = Screen.height * CrosshairVerticalPercentage;
+            MinVerticalAngle = -(Screen.height / 2f) + VerticalOffset;
+            MaxVerticalAngle = (Screen.height / 2f) - VerticalOffset;
         }
-
-
-        private void OnLook(InputAction.CallbackContext value)
+        
+        private void OnLook(InputAction.CallbackContext delta)
         {
-            MouseDelta = value.ReadValue<Vector2>();
-            CurrentLookDeltas.x += MouseDelta.x;
-            if (CurrentLookDeltas.x > MaxAngleHorizontal || CurrentLookDeltas.x < MinAngleHorizontal)
+            //Get Mouse Delta
+           Vector2 mouseDelta = delta.ReadValue<Vector2>();
+            
+            //Clamp X Coordinates
+            CurrentLookDeltas.x += mouseDelta.x * MouseSensitivity.x;
+            if (CurrentLookDeltas.x >= MaxHorizontalAngle || CurrentLookDeltas.x <= MinHorizontalAngle)
             {
-                CurrentLookDeltas.x -= MouseDelta.x;
+                CurrentLookDeltas.x -= mouseDelta.x * MouseSensitivity.x;
             }
-
-            CurrentLookDeltas.y += MouseDelta.y;
-            if (CurrentLookDeltas.y > MaxAngleVertical || CurrentLookDeltas.y < MinAngleVertical)
+            
+            //Clamp Y Coordinates
+            CurrentLookDeltas.y += mouseDelta.y * MouseSensitivity.y;
+            if (CurrentLookDeltas.y >= MaxVerticalAngle || CurrentLookDeltas.y <= MinVerticalAngle)
             {
-                CurrentLookDeltas.y -= MouseDelta.y;
+                CurrentLookDeltas.y -= mouseDelta.y * MouseSensitivity.y;
             }
         }
 
         // Update is called once per frame
         private void Update()
         {
-            float invertedValue = Inverted
-                ? CrossHairStartingPosition.y + CurrentLookDeltas.y * MouseSensitivity.y
-                : CrossHairStartingPosition.y - CurrentLookDeltas.y * MouseSensitivity.y;
-            CurrentLookPosition = new Vector2(CrossHairStartingPosition.x + CurrentLookDeltas.x * MouseSensitivity.x,
-                invertedValue);
+            float crosshairXPosition = CrossHairStartingPosition.x + CurrentLookDeltas.x;
+            float crosshairYPosition = Inverted
+                ? CrossHairStartingPosition.y + CurrentLookDeltas.y
+                : CrossHairStartingPosition.y - CurrentLookDeltas.y;
 
-            transform.position = CurrentLookPosition;
+            CurrentAimPosition = new Vector2(crosshairXPosition,
+                crosshairYPosition);
+            
+            transform.position = CurrentAimPosition;
         }
 
         private new void OnEnable()
