@@ -4,11 +4,20 @@ using Weapons;
 
 namespace Events
 {
+
+    public enum WeaponType
+    {
+        None,
+        MachineGun,
+        Pistol
+    }
+    
     public class WeaponEvents
     {
         [Serializable]
         public struct WeaponStats
         {
+            public WeaponType WeaponType;
             public string Name;
             public float Damage;
             public int BulletsInClip;
@@ -41,6 +50,7 @@ namespace Events
                 TotalBulletsAvailable = totalBulletsAvailable;
                 WeaponHitLayers = default;
                 Repeating = repeating;
+                WeaponType = WeaponType.None;
             }
         }
 

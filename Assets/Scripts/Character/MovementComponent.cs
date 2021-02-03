@@ -62,15 +62,15 @@ namespace Character
             
             #region TransformMovement
 
-            PlayerTransform.position += movementDirection;
+            //PlayerTransform.position += movementDirection;
 
             #endregion
             
-            //#region NavMeshMovement
-//
-            //NavAgent.Move(movementDirection);
-//
-            //#endregion
+           #region NavMeshMovement
+
+           NavAgent.Move(movementDirection);
+
+           #endregion
         }
 
         #region Player Movement
@@ -106,6 +106,8 @@ namespace Character
         public void OnJump(InputValue value)
         {
             if (!value.isPressed) return;
+            if (PlayerController.IsJumping) return;
+                
             PlayerController.IsJumping = true;
             PlayerAnimator.SetBool(IsJumpingHash, PlayerController.IsJumping);
             Rigidbody.AddForce((transform.up + MoveDirection) * JumpForce, ForceMode.Impulse);

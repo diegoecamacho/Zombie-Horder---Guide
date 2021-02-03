@@ -38,8 +38,7 @@ namespace Weapons
         private Camera ViewCamera;
 
         private ParticleSystem FiringEffect;
-
-
+        
         //Debug
         private RaycastHit HitLocation;
 
@@ -56,7 +55,7 @@ namespace Weapons
 
         private void FireWeapon()
         {
-            if (WeaponInformation.BulletsInClip > 0 && !Reloading)
+            if (WeaponInformation.BulletsInClip > 0 && !Reloading && !WeaponHolder.PlayerController.IsRunning)
             {
                 if (!FiringEffect)
                 {
@@ -104,19 +103,20 @@ namespace Weapons
         {
             if (FiringEffect) Destroy(FiringEffect.gameObject);
 
+
             //If the Amount of bullets available is less than the size of the clip, add all remaining bullets.
-            int bulletsToReload = WeaponInformation.TotalBulletsAvailable - WeaponInformation.ClipSize;
+            int bulletsToReload =  WeaponInformation.ClipSize - WeaponInformation.TotalBulletsAvailable;
             if (bulletsToReload < 0)
-            {
-                Debug.Log("Reload - Out Of Ammo");
-                WeaponInformation.BulletsInClip = WeaponInformation.TotalBulletsAvailable;
-                WeaponInformation.TotalBulletsAvailable = 0;
-            }
-            else
             {
                 Debug.Log("Reload");
                 WeaponInformation.BulletsInClip = WeaponInformation.ClipSize;
                 WeaponInformation.TotalBulletsAvailable -= WeaponInformation.ClipSize;
+
+            }
+            else
+            {
+                WeaponInformation.BulletsInClip = WeaponInformation.TotalBulletsAvailable;
+                WeaponInformation.TotalBulletsAvailable = 0;
             }
         }
         
